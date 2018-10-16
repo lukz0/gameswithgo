@@ -1,13 +1,9 @@
-/*
-	TODO:
-	1. Add a function that will insert a new page, after a given page
-	2. Add a function that will delete a page
-*/
-
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 )
 
 type storyPage struct {
@@ -15,23 +11,49 @@ type storyPage struct {
 	nextPage *storyPage
 }
 
-func playStory(page *storyPage) {
-	if page == nil {
-		return
+func (page *storyPage) playStory(scanner *bufio.Scanner) {
+	for page != nil {
+		fmt.Println(page.text)
+		page = page.nextPage
+		scanner.Scan()
 	}
-	fmt.Println(page.text)
-	playStory(page.nextPage)
+}
+
+func (page *storyPage) addToEnd(text string) {
+	for page.nextPage != nil {
+		page = page.nextPage
+	}
+	page.nextPage = &storyPage{text, nil}
+}
+
+func (page *storyPage) addAfter(text string) {
+	newPage := &storyPage{text, page.nextPage}
+	page.nextPage = newPage
+}
+
+func deletePageAfter(page *storyPage) {
+	page.nextPage = page.nextPage.nextPage
+}
+
+func insertPageAfter(pageBefore, insertedPage *storyPage) {
+	insertedPage.nextPage = pageBefore.nextPage
+	pageBefore.nextPage = insertedPage
 }
 
 func main() {
-	// scanner := bufio.NewScanner(os.Stdin)
+	scanner := bufio.NewScanner(os.Stdin)
 
 	page1 := storyPage{"It was a dark and stormy night.", nil}
-	page2 := storyPage{"You are alone, and you need to find the sacred helmet before the bad guys do", nil}
-	page3 := storyPage{"You see a troll ahead", nil}
+	page1.addToEnd("You are alone, and you need to find the sacred helmet before the bad guys do")
+	page1.addToEnd("You see a troll ahead")
 
-	page1.nextPage = &page2
-	page2.nextPage = &page3
+	var page2Ptr *storyPage = page1.nextPage
 
-	playStory(&page1)
+	deletePageAfter(&page1)           // delete second page
+	insertPageAfter(&page1, page2Ptr) // add second page back where it was
+
+	// fmt.Println(reflect.TypeOf(scanner)) // *bufio.Scanner
+
+	page1.addAfter("Testing addAfter()")
+	page1.playStory(scanner)
 }
