@@ -53,6 +53,7 @@ func main() {
 	insertPageAfter(&page1, page2Ptr) // add second page back where it was
 
 	// fmt.Println(reflect.TypeOf(scanner)) // *bufio.Scanner
+	// fmt.Printf("%T\n", scanner)
 
 	page1.addAfter("Testing addAfter()")
 	page1.playStory(scanner)
